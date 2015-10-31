@@ -14,9 +14,35 @@ RSpec.describe WeightedSelect::Selector do
   end
 
   describe '#add' do
+    let!(:selector) { WeightedSelect::Selector.new(a: 10) }
+
     context 'when weight not positive' do
-      it 'does not change total weight'
-      it 'does not change weights hash'
+      let(:action) { -> { selector.add(:b, 0) } }
+
+      it 'does not change total weight' do
+        expect(action).not_to change(selector, :total_weight)
+      end
+
+      it 'does not change weights hash' do
+        expect(action).not_to change(selector, :weights)
+      end
+    end
+
+    context 'when weight is positive' do
+      let(:action) { -> { selector.add(:b, 15) } }
+
+      it 'increases total weight' do
+        expect(action).to change(selector, :total_weight)
+      end
+
+      it 'adds item to weights hash' do
+        expect(action).to change(selector, :weights)
+      end
+
+      it 'uses subsequent interval as key' do
+        action.call
+        expect(selector.weights.keys.last).to eq(10...25)
+      end
     end
   end
 end
