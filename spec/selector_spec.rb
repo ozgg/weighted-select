@@ -31,8 +31,8 @@ RSpec.describe WeightedSelect::Selector do
     context 'when weight is positive' do
       let(:action) { -> { selector.add(:b, 15) } }
 
-      it 'increases total weight' do
-        expect(action).to change(selector, :total_weight)
+      it 'increases total weight by weight of item' do
+        expect(action).to change(selector, :total_weight).by(15)
       end
 
       it 'adds item to weights hash' do
@@ -43,6 +43,19 @@ RSpec.describe WeightedSelect::Selector do
         action.call
         expect(selector.weights.keys.last).to eq(10...25)
       end
+    end
+  end
+
+  describe '#select' do
+    it 'returns nil when weights is empty' do
+      selector = WeightedSelect::Selector.new
+      expect(selector.select).to be_nil
+    end
+
+    it 'returns existing element from weights' do
+      selector = WeightedSelect::Selector.new(a: 5, b: 5)
+      item = selector.select
+      expect([:a, :b]).to include(item)
     end
   end
 end

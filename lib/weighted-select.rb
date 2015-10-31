@@ -16,7 +16,20 @@ module WeightedSelect
       if delta > 0
         new_weight = @total_weight + delta
         weights[@total_weight...new_weight] = item
-        @total_weight += new_weight
+        @total_weight = new_weight
+      end
+    end
+
+    def select
+      extract_item unless @weights.empty?
+    end
+
+    private
+
+    def extract_item
+      weight = Random.rand(@total_weight)
+      @weights.each do |range, item|
+        return item if range === weight
       end
     end
   end
